@@ -151,7 +151,5 @@ jobs:
             # Drop the old version of the site
             # docker compose -f docker-compose.prod.yaml down
             # Start the new version
-            # docker compose -f docker-compose.prod.yaml up -d
-            docker compose up
-            cd backend
-            cargo run
+             docker compose -f docker-compose.prod.yaml up -d
+           
