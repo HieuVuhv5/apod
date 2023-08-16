@@ -147,8 +147,11 @@ jobs:
             #git clone --depth=1 --branch main https://github.com/HieuVuhv5/apod apod  # Clone the latest
             cd apod
             # Build the new version
-            docker compose -f docker-compose.prod.yaml build --no-cache --compress
+            # docker compose -f docker-compose.prod.yaml build --no-cache --compress
             # Drop the old version of the site
-            docker compose -f docker-compose.prod.yaml down
+            # docker compose -f docker-compose.prod.yaml down
             # Start the new version
-            docker compose -f docker-compose.prod.yaml up -d
+            # docker compose -f docker-compose.prod.yaml up -d
+            docker compose up
+            cd backend
+            cargo run
