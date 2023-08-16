@@ -29,7 +29,7 @@ The website offers the following features:
 
 2. User Galleries:
    - Registered users can create and customize their own galleries to store APODs.
-   - ![User Gallery](/report_apod/user_gallery.png)
+   - ![User Gallery](/report_apod/gallery.png)
 
 3. Slide Show:
    - Users with their own galleries can enjoy a slide show of the Astronomy Pictures in their gallery.
