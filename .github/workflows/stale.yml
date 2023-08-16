@@ -132,19 +132,19 @@ jobs:
             mv /tmp/environment.tmp /etc/environment
             
             # Install dependencies if they aren't already installed
-            sudo apt-get install -y build-essential libssl-dev pkg-config
+            #sudo apt-get install -y build-essential libssl-dev pkg-config
             
             # Install Rust if it isn't
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            #curl https://sh.rustup.rs -sSf | sh -s -- -y
             source $HOME/.cargo/env
             
             # Install sqlx-cli
-            cargo install sqlx-cli
+            #cargo install sqlx-cli
             
             mkdir -p ~/workspace
             cd ~/workspace/
-            rm -rf ./apod
-            git clone --depth=1 --branch main https://github.com/HieuVuhv5/apod apod  # Clone the latest
+            #rm -rf ./apod
+            #git clone --depth=1 --branch main https://github.com/HieuVuhv5/apod apod  # Clone the latest
             cd apod
             # Build the new version
             docker compose -f docker-compose.prod.yaml build --no-cache --compress
