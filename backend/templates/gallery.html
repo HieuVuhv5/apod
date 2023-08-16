@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project APOD</title>
+    <!--<link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+    />
+    -->
+    <link rel="stylesheet" href="http://hv529980.ipage.com/css/styles.css" />
+    <link rel="stylesheet" href="http://hv529980.ipage.com/css/pj_project.css" />
+
+</head>
+
+<body style="display: flex; justify-content: center;">
+<main style="width: 90%; padding: 20px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+    <ul>
+        <li><a href="./">Home</a></li>
+        <li><a  href="./apod">Newest 20 APODs</a></li>
+        <li><a  class="active" href="./gallery">Your Gallery</a></li>
+        <li><a href="/slideshow">Slide Show</a></li>
+        {% if is_logged_in %}
+        <li><a href="./logout">Logout</a></li>
+        {% endif %}
+
+    </ul>
+    <div class="grid-container grid-areas-container">
+        <div class="grid-item item_title"><h1 class="title">Astronomy Pictures - Gallery</h1></div>
+
+    </div>
+
+    <div class="grid-container-apod grid-areas-container">
+        {% if item_count < 1 %}
+        <h2 style="color: pink">You are not add any picture to your gallery, add some to presentation</h2>
+        {% else %}
+
+        {% for package in packages %}
+
+        <div class="grid-item   "><h2> {{package.apod.title}}</h2>
+            <a href="{{package.apod.hdurl}}" ><img class="project_img" src="{{package.apod.url}}" alt="Copyright by"></a>
+            <div class="copy_right">Date Create: {{package.apod.date}}<br>
+
+
+            </div>
+            <div class="descript_para"><h4>{{package.apod.explanation}}</h4></div>
+
+
+            <form action="/delete_gallery" method="post" class="form" style="border: none;">
+                <input type="hidden" name="email"  value="{{claims.email}}">
+                <input type="hidden" name="apod_id"  value="{{package.apod.id}}">
+                <input type="submit" value="Delete" class="button button1" >
+
+            </form>
+
+        </div>
+
+        {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+    <div class="footer">  <p>Copyright  2023 by Hieu Vu</p>      </div>
+
+</main>
+
+</body>
+</html>

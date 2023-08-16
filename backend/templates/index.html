@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project APOD</title>
+
+    <link rel="stylesheet" href="http://hv529980.ipage.com/css/styles.css" />
+    <link rel="stylesheet" href="http://hv529980.ipage.com/css/pj_project.css" />
+
+</head>
+
+<body style="display: flex; justify-content: center;">
+<main style="width: 90%; padding: 20px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+
+    <ul>
+        <li><a class="active" href="./">Home</a></li>
+        <li><a  href="./apod">Newest 20 APODs</a></li>
+        <li><a  href="./gallery">Your Gallery</a></li>
+        <li><a href="./slideshow">Slide Show</a></li>
+        {% if is_logged_in %}
+        <li><a href="./logout">Logout</a></li>
+        {% endif %}
+    </ul>
+
+{% if is_logged_in %}
+    <!-- From search Astronomy Picture -->
+    <div class="grid-container grid-areas-container">
+        <div class="grid-item item_title"><h2 class="title">Search</h2></div>
+    </div>
+    <form action="/search" method="post" class="form">
+        <label for="date">Select Date :</label>
+        <input type="date" id="date" name="date" min="2000-01-01"  required>
+        </br>
+        <input type="submit" value="Search" class="btn-primary" >
+        <input type="reset" value="Reset" class="btn-secondary">
+    </form>
+
+    <script>
+        const inputElement = document.getElementById("date");
+
+        // Get today's date in YYYY-MM-DD format
+        const today = new Date().toISOString().split('T')[0];
+
+        // Set the max attribute to today's date
+        inputElement.setAttribute("max", today);
+    </script>
+
+
+    <! -- Display searching result -->
+
+    {% if is_searching %}
+
+        <div class="grid-item   "><h2> {{package.apod.title}}</h2>
+        <a href="{{package.apod.hdurl}}" ><img class="project_img" src="{{package.apod.url}}" alt="Copyright by"></a>
+        <div class="copy_right">Date Create: {{package.apod.date}}<br>
+
+
+        </div>
+        <div class="descript_para"><h4>{{package.apod.explanation}}</h4></div>
+
+
+                <form action="/add_gallery" method="post" class="form" style="border: none;">
+                    <input type="hidden" name="email"  value="{{claims.email}}">
+                    <input type="hidden" name="apod_id"  value="{{package.apod.id}}">
+                <input type="submit" value="Add to gallery" class="button button1" >
+
+            </form>
+
+
+     </div>
+
+
+
+    {% endif %}
+
+
+{% else %}
+
+    <!--show login form-->
+    <div class="grid-container grid-areas-container">
+        <div class="grid-item item_title"><h2 class="title">Login</h2></div>
+
+    </div>
+
+    <form action="/login" method="post" class="form">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"  required>
+
+        </br>
+        <input type="submit" value="Login" class="btn-primary" >
+        <input type="reset" value="Reset" class="btn-secondary">
+
+    </form>
+
+    <p> <h5>Don't have an account?</h5></p>
+    <p> <h5><a href="./get_register">Register Here</a></h5></p>
+
+
+{% endif %}
+</main>
+</body>
+</html>

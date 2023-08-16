@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hieu Vu Final Project</title>
+
+    <link rel="stylesheet" href="http://hv529980.ipage.com/css/styles.css" />
+    <link rel="stylesheet" href="http://hv529980.ipage.com/css/pj_project.css" />
+    <link rel="stylesheet" href=http://hv529980.ipage.com/css/pj_index.css">
+
+</head>
+
+<body style="display: flex; justify-content: center;">
+<main style="width: 90%; padding: 20px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+     <ul>
+        <li><a class="active"   href="./">Home</a></li>
+        <li><a href="./apod">Your Gallery</a></li>
+        <li><a href="./slideshow">Slide Show</a></li>
+         {% if is_logged_in %}
+        <li><a href="./logout">Logout</a></li>
+         {% endif %}
+    </ul>
+
+
+<h1>Hello {{claims.email}} YOU ARE LOGGED IN</h1>
+    <h2> test user_id {{claims.id}}</h2>
+
+<form action="/logout" method="post">
+
+    <input type="submit" value="logout">
+</form>
+</body>

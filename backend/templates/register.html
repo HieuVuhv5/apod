@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project APOD</title>
+
+  <link rel="stylesheet" href="http://hv529980.ipage.com/css/styles.css" />
+  <link rel="stylesheet" href="http://hv529980.ipage.com/css/pj_project.css" />
+
+</head>
+
+<body style="display: flex; justify-content: center;">
+<main style="width: 90%; padding: 20px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+
+  <ul>
+    <li><a class="active" href="./">Home</a></li>
+    <li><a  href="./apod">Newest 20 APODs</a></li>
+    <li><a  href="./gallery">Your Gallery</a></li>
+    <li><a href="./slideshow">Slide Show</a></li>
+    {% if is_logged_in %}
+    <li><a href="./logout">Logout</a></li>
+    {% endif %}
+  </ul>
+
+
+
+  <!--show login form-->
+  <div class="grid-container grid-areas-container">
+    <div class="grid-item item_title"><h2 class="title">Sign Up</h2></div>
+
+  </div>
+
+  <form action="/register" method="post" class="form">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    <label for="password">Password:</label>
+    <input type="password" placeholder="Password" id="password" name="password" required>
+    <label for="confirm_password">Password:</label>
+    <input type="password" placeholder="Confirm Password" id="confirm_password" name="confirm_password" required>
+
+    </br>
+    <input type="submit" value="Register" class="btn-primary" >
+    <input type="reset" value="Reset" class="btn-secondary">
+
+  </form>
+<script>
+
+  var password = document.getElementById("password")
+          , confirm_password = document.getElementById("confirm_password");
+
+  function validatePassword(){
+    if(password.value != confirm_password.value) {
+      confirm_password.setCustomValidity("Passwords Don't Match");
+    } else {
+      confirm_password.setCustomValidity('');
+    }
+  }
+
+  password.onchange = validatePassword;
+  confirm_password.onkeyup = validatePassword;
+
+
+
+</script>
+
+
+</main>
+
+
+
+</body>
+</html>
