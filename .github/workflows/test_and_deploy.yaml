@@ -108,7 +108,8 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: root
           # This is explicitly an SSH private key stored inside of Github Repo's "Repository Secrets" used to authenticate to our prod server
-          key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          #key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          password: ${{ secrets.USER_PASS }}
           script: | # Necessary to inject the proper environment from our GH Secrets.  Note that now, we can REMOVE THEM from our repo itself!                        
             # Extract PATH and save it to a temp file
             grep '^PATH=' /etc/environment > /tmp/environment.tmp
