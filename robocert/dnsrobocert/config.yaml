@@ -1,0 +1,14 @@
+draft: false
+acme:
+  email_account: hv5@pdx.edu
+  staging: false # set to TRUE while testing or you will be banned for a week!
+profiles:
+  - name: hetzner
+    provider: hetzner
+    provider_options:
+      auth_token: ${{ HETZNER_DNS_AUTH_TOKEN }}
+certificates:
+  - domains:
+      - "*.tonghopmoi.com/"
+      - tonghopmoi.com/
+    profile: hetzner

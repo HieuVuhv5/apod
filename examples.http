@@ -1,0 +1,105 @@
+POST http://localhost:3000/apod
+Content-Type: application/json
+
+{
+  "title": "a title",
+  "explanation": "Some content",
+  "date": "2023-08-10",
+  "hdurl": "https://apod.nasa.gov/apod/image/2308/M51_255hours.jpg",
+  "url": "https://apod.nasa.gov/apod/image/2308/M51_255hours_1024.jpg"
+
+}
+
+###
+GET http://localhost:3000/apod/2023-07-20
+Accept: application/json
+
+###
+###
+GET http://localhost:3000/
+Accept: application/json
+
+###
+
+###
+GET http://localhost:3000/apods
+Accept: application/json
+
+###
+
+###
+GET http://localhost:3000/apod
+Accept: application/json
+
+###
+
+GET https://api.nasa.gov/planetary/apod?api_key=GjmkqxDe1nZLLdmixSZJKcFlrGGa6MP08aBDSCKC & start_date =2023-07-07 & end_date =2023-08-12
+Accept: application/json
+
+###
+GET https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY
+accept: application/json
+
+###
+DELETE http://localhost:3000/question?question_id=1
+Content-Type: application/json
+
+{
+  "title": "a title",
+  "content": "Some content",
+  "tags": ["tag1", "tag2"]
+}
+
+
+###
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "email": "email12@email.com",
+  "password": "password",
+  "confirm_password": "password"
+}
+
+###
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "email": "newemail12@email.com",
+  "password": "password"
+}
+
+###
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "email": "hhhh@email.com",
+  "password": "ggghhhhhh"
+}
+###
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+  "email": "hhhh@email.com",
+  "password": "hhhh",
+  "confirm_password": "hhhh"
+}
+
+
+###
+GET http://localhost:3000/protected
+Content-Type: application/json
+Accept: application/json
+Authorization: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6MCwiZW1haWwiOiJoaGhoQGVtYWlsLmNvbSIsImV4cCI6MTY5MTc1ODM3MX0.8RRlhIa5qq5wuDEXs2xSh76gOjbJQoHGWLKdt_VbEXc
+###
+GET http://localhost:3000/comments
+Content-Type: application/json
+Accept: application/json
+
+{
+  "question_id": 1
+}
