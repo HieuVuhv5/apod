@@ -1,0 +1,153 @@
+name: Heap Overrun CICD
+
+on:
+  push:
+    branches: [ master, main, develop, sslpractice, sslpracticenew ]
+  pull_request:
+    branches: [ master, main, develop, sslpractice ]
+
+env:
+  CARGO_TERM_COLOR: always #Pretty-print the logs
+
+jobs:
+
+  # Run cargo test on our backend and stop deployment if it fails
+  test:
+    runs-on: ubuntu-latest
+    services:
+      # Create test database that GA will cargo test against
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        # Ensure we don't start compiling our backend until the database is up
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      # Get our repository's codebase
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Create a cache so that subsequent GA runs won't have to re-compile dependencies
+      - name: Cache Cargo registry
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache Cargo target dir
+        uses: actions/cache@v2
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache sqlx-cli
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/bin/sqlx
+          key: ${{ runner.os }}-sqlx-cli-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      # Only install sqlx-cli if it isn't already cached
+      - name: Install sqlx-cli
+        run: |
+          if [[ ! -x ~/.cargo/bin/sqlx ]]; then
+            cargo install sqlx-cli
+          fi
+
+      - name: Run migrations
+        run: sqlx migrate run
+        working-directory: backend
+        env:
+          DATABASE_URL: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost/${{ secrets.POSTGRES_DB }}
+
+      - name: Change to backend directory
+        run: cd backend
+
+      # Compile our code -- note that sqlx WILL use our database here to verify the queries!
+      - name: Build
+        run: cargo build --verbose
+        working-directory: backend
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_URL: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost/${{ secrets.POSTGRES_DB }}
+
+      # Runs cargo test.  Note that our deploy step WILL NOT RUN if these tests fail!  See `needs: [test]`
+      - name: Run tests
+        run: cargo test --verbose
+        working-directory: backend
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          DATABASE_URL: postgres://${{ secrets.POSTGRES_USER }}:${{ secrets.POSTGRES_PASSWORD }}@localhost/${{ secrets.POSTGRES_DB }}
+
+  # This will deploy our app to a production server if the tests completed successfully
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ test ]
+    steps:
+      - uses: appleboy/ssh-action@master
+        with:
+          # Live site IP address (Normally this would be tied to a domain name like doggr.pro)
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: root
+          # This is explicitly an SSH private key stored inside of Github Repo's "Repository Secrets" used to authenticate to our prod server
+          key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+          script: | # Necessary to inject the proper environment from our GH Secrets.  Note that now, we can REMOVE THEM from our repo itself!                        
+            # Extract PATH and save it to a temp file
+            grep '^PATH=' /etc/environment > /tmp/environment.tmp
+            chmod 600 /tmp/environment.tmp
+            
+            # Append the environment variables
+            echo "API_HOST=${{ secrets.API_HOST }}" >> /tmp/environment.tmp
+            echo "API_PORT=${{ secrets.API_PORT }}" >> /tmp/environment.tmp
+            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" >> /tmp/environment.tmp
+            echo "LOCAL_DATABASE_URL=\"${{ secrets.LOCAL_DATABASE_URL }}\"" >> /tmp/environment.tmp
+            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> /tmp/environment.tmp
+            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> /tmp/environment.tmp
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /tmp/environment.tmp
+            echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> /tmp/environment.tmp
+            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> /tmp/environment.tmp
+            echo "SALT=${{ secrets.SALT }}" >> /tmp/environment.tmp
+            echo "SQLX_OFFLINE=${{ secrets.SQLX_OFFLINE }}" >> /tmp/environment.tmp
+            
+            # Move the temp file to /etc/environment
+            mv /tmp/environment.tmp /etc/environment
+            
+            # Install dependencies if they aren't already installed
+            sudo apt-get install -y build-essential libssl-dev pkg-config
+            
+            # Install Rust if it isn't
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            source $HOME/.cargo/env
+            
+            # Install sqlx-cli
+            cargo install sqlx-cli
+            
+            mkdir -p ~/workspace
+            cd ~/workspace/
+            rm -rf ./apod
+            git clone --depth=1 --branch main https://github.com/HieuVuhv5/apod apod  # Clone the latest
+            cd apod
+            # Build the new version
+            docker compose -f docker-compose.prod.yaml build --no-cache --compress
+            # Drop the old version of the site
+            docker compose -f docker-compose.prod.yaml down
+            # Start the new version
+            docker compose -f docker-compose.prod.yaml up -d
