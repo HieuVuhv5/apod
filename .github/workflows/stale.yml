@@ -118,7 +118,7 @@ jobs:
             # Append the environment variables
             echo "API_HOST=${{ secrets.API_HOST }}" >> /tmp/environment.tmp
             echo "API_PORT=${{ secrets.API_PORT }}" >> /tmp/environment.tmp
-            echo "DATABASE_URL=\"${{ secrets.DATABASE_URL }}\"" >> /tmp/environment.tmp
+            echo "DATABASE_URL=\"${{ secrets.LOCAL_DATABASE_URL }}\"" >> /tmp/environment.tmp
             echo "LOCAL_DATABASE_URL=\"${{ secrets.LOCAL_DATABASE_URL }}\"" >> /tmp/environment.tmp
             echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> /tmp/environment.tmp
             echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> /tmp/environment.tmp
